@@ -25,7 +25,7 @@ else:
 
     point = organization["geometry"]["coordinates"]
     org_point = "{0},{1}".format(point[0], point[1])
-    size = organization['SearchResponse']['boundedBy']
+    size = json_response['properties']['ResponseMetaData']['SearchResponse']['boundedBy']
     delta_x, delta_y = scale(size)
 
     map_params = {
