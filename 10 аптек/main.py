@@ -60,7 +60,6 @@ def response_map(apikey, map_api_server, l, ll, pt):
         'apikey': apikey
     }
     response = requests.get(map_api_server, params=map_params)
-    print(response.url)
     if not response:
         print('There are no matches(map)')
         exit()
