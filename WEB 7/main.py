@@ -1,6 +1,5 @@
 import requests
 import os
-from scale import scale
 import pygame
 import json
 
@@ -110,8 +109,11 @@ def create_image(toponym_to_find):
 
     MAP_API_SERVER = "http://static-maps.yandex.ru/1.x/"
     APIKEY_MAP = '40d1649f-0493-4b70-98ba-98533de7710b'
-    spn = ','.join(scale([list(map(float, size['upperCorner'].split(' '))),
-                          list(map(float, toponym_coodrinates.split(' ')))]))
+    size = [list(map(float, size['upperCorner'].split(' '))),
+            list(map(float, toponym_coodrinates.split(' ')))]
+    longitude = round(abs(size[0][0] - size[1][0]), 4)
+    latitude = round(abs(size[0][1] - size[1][1]), 4)
+    spn = ','.join((str(longitude), str(latitude)))
     with open("settings.json") as file:
         data = json.load(file)
         pt = data['Coords']
