@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Список профессий</h2>
+{% set list = ["инженер-исследователь", "пилот", "строитель", "инженер по терраформированию"] %}
+{% if "ol" in type %}
+<ol>
+    {% for user in list %}
+    <li>{{ user }}
+    </li>
+    {% endfor %}
+</ol>
+{% elif "ul" in type %}
+<ul>
+    {% for user in list %}
+    <li>{{ user }}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>wrong param</h2>
+{% endif %}
+{% endblock %}
