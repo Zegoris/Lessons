@@ -1,7 +1,8 @@
-import vk_api, time
+import vk_api
 from flask import Flask, render_template
 
-"""LOGIN, PASSWORD = input('Login: '), input('Password: ')"""
+LOGIN, PASSWORD = input('Login: '), input('Password: ')
+GROUP_ID = input('Group id: ')
 
 
 def auth_handler():
@@ -12,7 +13,7 @@ def auth_handler():
 
 
 def main():
-    """login, password = LOGIN, PASSWORD
+    login, password = LOGIN, PASSWORD
     vk_session = vk_api.VkApi(login, password, auth_handler=auth_handler)
     try:
         vk_session.auth(token_only=True)
@@ -29,10 +30,7 @@ def main():
         information['Ages'] = response['reach']['age']
         information['Cities'] = [i['name'] for i in response['reach']['cities']]
     else:
-        exit()"""
-    information = {'Activities': [('likes', 1), ('comments', 5), ('subscribed', 10)],
-                   'Ages': [('12-18', 1), ('18-21', 5)],
-                   'Cities': ['Moscow, Russia']}
+        exit()
     app = Flask(__name__)
 
     @app.route('/')
@@ -40,7 +38,7 @@ def main():
         return render_template('main.html')
     @app.route('/vk_stat/<int:group_id>')
     def statistic(group_id):
-        """login, password = LOGIN, PASSWORD
+        login, password = LOGIN, PASSWORD
         vk_session = vk_api.VkApi(login, password, auth_handler=auth_handler)
         try:
             vk_session.auth(token_only=True)
@@ -57,7 +55,7 @@ def main():
             information['Ages'] = response['reach']['age']
             information['Cities'] = [i['name'] for i in response['reach']['cities']]
         else:
-            exit()"""
+            exit()
         return render_template('stats.html', info=information)
 
     app.run(port=5050, host='127.0.0.1')
