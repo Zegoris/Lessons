@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{file['name']}}</h2>
+<p class="fig"><img src={{file['photo']}} alt="альтернативный текст"></p>
+<h4 style="text-align:center">{{file['prof']}}</h4>
+{% endblock %}
