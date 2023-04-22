@@ -1,5 +1,7 @@
 from flask import jsonify, request, Blueprint
 
+from datetime import datetime
+
 from data import db_session
 from data.jobs import Jobs
 
@@ -56,6 +58,8 @@ def create_job():
         collaborators=request.json['collaborators'],
         is_finished = request.json['is_finished']
     )
+    if jobs.is_finished:
+        jobs.end_date = datetime.now()
     db_sess.add(jobs)
     db_sess.commit()
     return jsonify({'success': 'OK'})

@@ -3,12 +3,14 @@ from forms.job import JobForm
 from forms.login import LoginForm
 from forms.department import DepartmentForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from data import db_session, jobs_api
+from data import db_session, jobs_api, users_api
 from data.users import User
 from data.jobs import Jobs
 from data.departments import Department
 from flask import Flask, render_template, redirect, request, make_response, jsonify, abort
 from datetime import datetime
+from requests import get
+from os import remove
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -22,8 +24,80 @@ db_sess = db_session.create_session()
 
 def main():
     app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
     app.run(port=8888, host='127.0.0.1')
 
+
+def response_toponym(apikey, geocoder_api_server, geocode, format):
+    geocoder_params = {
+        "apikey": apikey,
+        "geocode": geocode,
+        "format": format
+    }
+    response = get(geocoder_api_server, params=geocoder_params)
+    if not response:
+        print('There are no matches(toponym)')
+        print(response.url)
+        print(f'Http статус: {response.status_code} ({response.reason})')
+        exit()
+    else:
+        return response.json()
+
+
+def response_map(apikey, map_api_server, l, ll, spn):
+    map_params = {
+        "l": l,
+        "ll": ll,
+        "spn": spn,
+        "apikey": apikey
+    }
+    response = get(map_api_server, params=map_params)
+    if not response:
+        print('There are no matches(map)')
+        print(response.url)
+        print(f'Http статус: {response.status_code} ({response.reason})')
+        exit()
+    else:
+        return response.content
+
+
+def create_image(toponym_to_find):
+
+    GEOCODER_API_SERVER = "http://geocode-maps.yandex.ru/1.x/"
+    APIKEY_TOPONYM = "40d1649f-0493-4b70-98ba-98533de7710b"
+    json_toponym = response_toponym(APIKEY_TOPONYM, GEOCODER_API_SERVER,
+                                    toponym_to_find, 'json')
+    toponym = json_toponym["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+    size = toponym['boundedBy']['Envelope']
+
+    toponym_coodrinates = toponym["Point"]["pos"]
+    toponym_longitude, toponym_latitude = toponym_coodrinates.split(" ")
+    address_ll = ",".join([toponym_longitude, toponym_latitude])
+
+    MAP_API_SERVER = "http://static-maps.yandex.ru/1.x/"
+    APIKEY_MAP = '40d1649f-0493-4b70-98ba-98533de7710b'
+    size = [list(map(float, size['upperCorner'].split(' '))),
+            list(map(float, toponym_coodrinates.split(' ')))]
+    longitude = round(abs(size[0][0] - size[1][0]) / 2, 4)
+    latitude = round(abs(size[0][1] - size[1][1]) / 2, 4)
+    spn = ','.join((str(longitude), str(latitude)))
+    bite_map = response_map(APIKEY_MAP, MAP_API_SERVER, 'sat', address_ll, spn)
+    return bite_map
+
+
+@app.route('/user_show')
+@login_required
+def show():
+    try:
+        remove(f'static/images/map.jpeg')
+    except FileNotFoundError:
+        pass
+    city = get((f'http://localhost:8888/api/users/{current_user.id}')).json()['user']['city_from']
+    toponym = create_image(city)
+    with open(f'static/images/map.jpeg', "wb") as file:
+        file.write(toponym)
+    return render_template("show.html", title='Родина',
+                           action=city, image='static/images/map.jpeg')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -70,6 +144,7 @@ def reqister():
             name=form.name.data,
             age=form.age.data,
             position=form.position.data,
+            city_from=form.city.data,
             speciality=form.speciality.data,
             address=form.address.data
         )
