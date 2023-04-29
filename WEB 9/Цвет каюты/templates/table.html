@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3 style="text-align: center">Оформление каюты</h3>
+  <table class="table">
+    <thead>
+      <tr class="table-secondary">
+        <th scope="col">Цвет стен</th>
+        <th scope="col">Эмблема</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+          {% if {{gender}} == "male" and {{age}} < 21%}
+        <td class="table-primary"><img src="static/images/color_male_young.png"></td>
+        <td class="table-primary"><img src="static/images/emblem_male_young.png"></td>
+          {% elif {{gender}} == "male" and {{age}} >= 21%}
+        <td class="table-primary"><img src="static/images/color_male_adult.png"></td>
+        <td class="table-primary"><img src="static/images/emblem_male_adult.png"></td>
+          {% elif {{gender}} == "female" and {{age}} < 21%}
+       <td class="table-primary"><img src="static/images/color_female_young.png"></td>
+        <td class="table-primary"><img src="static/images/emblem_female_young.png"></td>
+          {% elif {{gender}} == "female" and {{age}} >= 21%}
+        <td class="table-primary"><img src="static/images/color_female_adult.png"></td>
+        <td class="table-primary"><img src="static/images/emblem_female_adult.png"></td>
+          {% else %}
+        <td class="table-primary">Wrong format</td>
+        <td class="table-primary">Wrong format</td>
+          {% endif %}
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}
