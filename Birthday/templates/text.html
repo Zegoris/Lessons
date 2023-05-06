@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <h1>Дорогая {{ name }}!</h1>
+ {% for item in text %}
+ <h2>{{ item }}</h2>
+ {% endfor %}
+<div style="display: flex; justify-content: center; align-items: center;">
+  <img src="/static/img/cake.png" alt="Мы тебя любим!!!">
+</div>
+{% endblock %}
